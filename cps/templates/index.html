@@ -1,5 +1,42 @@
 {% extends "layout.html" %}
 {% block body %}
+{% if g.user.show_detail_random() %}
+<div class="discover">
+  <h2>{{_('Discover (Random Books)')}}</h2>
+  <div class="row">
+
+    {% for entry in random %}
+    <div class="col-sm-3 col-lg-2 col-xs-6 book" id="books_rand">
+      <div class="cover">
+          <a href="{{ url_for('show_book', book_id=entry.id) }}" data-toggle="modal" data-target="#bookDetailsModal" data-remote="false">
+            {% if entry.has_cover %}
+              <img src="{{ url_for('get_cover', cover_path=entry.path.replace('\\','/')) }}" alt="{{ entry.title }}" />
+            {% else %}
+              <img src="{{ url_for('static', filename='generic_cover.jpg') }}" alt="{{ entry.title }}" />
+            {% endif %}
+          </a>
+      </div>
+      <div class="meta">
+        <p class="title">{{entry.title|shortentitle}}</p>
+        <p class="author"><a href="{{url_for('author', book_id=entry.authors[0].id) }}">{{entry.authors[0].name}}</a></p>
+        {% if entry.ratings.__len__() > 0 %}
+        <div class="rating">
+          {% for number in range((entry.ratings[0].rating/2)|int(2)) %}
+            <span class="glyphicon glyphicon-star good"></span>
+            {% if loop.last and loop.index < 5 %}
+              {% for numer in range(5 - loop.index) %}
+                <span class="glyphicon glyphicon-star"></span>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 <div class="discover load-more">
   <h2>{{title}}</h2>
   <div class="row">
@@ -43,41 +80,4 @@
   {% endif %}
   </div>
 </div>
-{% if g.user.show_detail_random() %}
-<div class="discover">
-  <h2>{{_('Discover (Random Books)')}}</h2>
-  <div class="row">
-
-    {% for entry in random %}
-    <div class="col-sm-3 col-lg-2 col-xs-6 book" id="books_rand">
-      <div class="cover">
-          <a href="{{ url_for('show_book', book_id=entry.id) }}" data-toggle="modal" data-target="#bookDetailsModal" data-remote="false">
-            {% if entry.has_cover %}
-              <img src="{{ url_for('get_cover', cover_path=entry.path.replace('\\','/')) }}" alt="{{ entry.title }}" />
-            {% else %}
-              <img src="{{ url_for('static', filename='generic_cover.jpg') }}" alt="{{ entry.title }}" />
-            {% endif %}
-          </a>
-      </div>
-      <div class="meta">
-        <p class="title">{{entry.title|shortentitle}}</p>
-        <p class="author"><a href="{{url_for('author', book_id=entry.authors[0].id) }}">{{entry.authors[0].name}}</a></p>
-        {% if entry.ratings.__len__() > 0 %}
-        <div class="rating">
-          {% for number in range((entry.ratings[0].rating/2)|int(2)) %}
-            <span class="glyphicon glyphicon-star good"></span>
-            {% if loop.last and loop.index < 5 %}
-              {% for numer in range(5 - loop.index) %}
-                <span class="glyphicon glyphicon-star"></span>
-              {% endfor %}
-            {% endif %}
-          {% endfor %}
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
 {% endblock %}
